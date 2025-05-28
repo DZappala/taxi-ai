@@ -4,3 +4,17 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+burn = { version = "0.17.0", features = ["wgpu"] }
+charming = "0.5.0"
+itertools = "0.14.0"
+num = "0.4.3"
+polars = { version = "0.48.1", features = [
+  "full",
+  "trigonometry",
+  "cov",
+  "dtype-array",
+] }
+rayon = "1.10.0"
+thiserror = "2.0.12"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["local-time"] }
