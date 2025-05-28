@@ -1,2 +1,4 @@
 /target
-/db
+/db/record/*
+/db/log/*
+/db/www/*
