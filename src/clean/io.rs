@@ -1,5 +1,5 @@
 use std::{
-    fs::{File, exists, remove_file},
+    fs::{File, remove_file},
     path::Path,
 };
 
@@ -122,7 +122,7 @@ pub fn save_csv(
     }: &mut NamedData<'_>,
 ) {
     let path = format!("db/record/taxi_weather-{name}.csv");
-    if exists(&path).unwrap() {
+    if Path::new(&path).exists() {
         info!("Removing csv file. Already exists.");
         remove_file(&path).unwrap();
     }
