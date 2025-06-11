@@ -1,11 +1,11 @@
 use std::path::Path;
 
-use super::io::{NamedDataFrame, RawData, WEATHER_RAW, load_csv, save_csv, scan_csv};
+use super::io::{NamedData, RawData, WEATHER_RAW, load_csv, save_csv, scan_csv};
 use polars::prelude::*;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use tracing::{info, instrument};
 
-pub fn clean(lf: LazyFrame) -> PolarsResult<DataFrame> {
+fn clean(lf: LazyFrame) -> PolarsResult<DataFrame> {
     lf.select([
         col("tpep_pickup_datetime").alias("time"),
         col("passenger_count"),
@@ -53,7 +53,7 @@ type RawMeta = (bool, String);
 #[instrument]
 pub fn preproc_checked<'a>(
     boxed_raw_taxi_data: &'a [(&'a RawData<'a>, RawMeta)],
-) -> Vec<NamedDataFrame<'a>> {
+) -> Vec<NamedData<'a>> {
     let scanned_weather_data = scan_csv(Path::new(WEATHER_RAW))
         .unwrap_or_else(|e| panic!("Failed to parse weather data: {e}"));
     boxed_raw_taxi_data
@@ -71,17 +71,14 @@ pub fn preproc_checked<'a>(
 }
 
 #[instrument]
-pub fn preproc<'a>(
-    raw_taxi_data: &RawData<'a>,
-    scanned_weather_data: &DataFrame,
-) -> NamedDataFrame<'a> {
+fn preproc<'a>(raw_taxi_data: &RawData<'a>, scanned_weather_data: &DataFrame) -> NamedData<'a> {
     let RawData { name, ent } = raw_taxi_data;
-    let NamedDataFrame { name, df } = LazyFrame::scan_parquet(ent, ScanArgsParquet::default())
+    let NamedData { name, df } = LazyFrame::scan_parquet(ent, ScanArgsParquet::default())
         .and_then(clean)
-        .map(|df| NamedDataFrame { name, df })
+        .map(|df| NamedData { name, df })
         .unwrap();
 
-    let mut joined_taxi_weather: NamedDataFrame = df
+    let mut joined_taxi_weather: NamedData = df
         .join(
             scanned_weather_data,
             ["time"],
@@ -89,7 +86,7 @@ pub fn preproc<'a>(
             JoinArgs::new(JoinType::AsOf(AsOfOptions::default())),
             None,
         )
-        .map(|v| NamedDataFrame::new(name, v.drop_many(["time", "time_ns"])))
+        .map(|v| NamedData::new(name, v.drop_many(["time", "time_ns"])))
         .unwrap_or_else(|e| panic!("Failed to join taxi and weather data; {e}"));
 
     save_csv(&mut joined_taxi_weather);

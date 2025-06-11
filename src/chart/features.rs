@@ -1,11 +1,10 @@
 use charming::{
-    Chart, HtmlRenderer,
+    Chart,
     component::{Axis, Grid, VisualMap},
     datatype::DataPoint,
     element::{AxisType, Emphasis, ItemStyle, Label, Orient, SplitArea, Tooltip},
     series::Heatmap,
 };
-
 use polars::prelude::{cov::pearson_corr, *};
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 use tracing::instrument;
@@ -40,7 +39,7 @@ pub fn chart(data: &DataFrame) -> Chart {
 
     Chart::new()
         .tooltip(Tooltip::new().position("top"))
-        .grid(Grid::new().height("50%").top("10%"))
+        .grid(Grid::new().top("10%"))
         .x_axis(
             Axis::new()
                 .type_(AxisType::Category)
@@ -75,11 +74,4 @@ pub fn chart(data: &DataFrame) -> Chart {
                 )
                 .data(out_data),
         )
-}
-
-pub fn render(chart: Chart, name: &str) {
-    let mut renderer = HtmlRenderer::new(name, 1000, 1000);
-    renderer
-        .save(&chart, format!("out/{name}-chart.html"))
-        .unwrap();
 }

@@ -4,21 +4,120 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-burn = { version = "0.17.0", features = ["wgpu"] }
-charming = "0.5.0"
-itertools = "0.14.0"
-num = "0.4.3"
-polars = { version = "0.48.1", features = [
-  "full",
+anyhow = { version = "1.0.98", features = ["backtrace"] }
+burn = { version = "*", features = ["wgpu"] }
+charming = { version = "*", features = ["wasm"] }
+console_error_panic_hook = "*"
+dioxus = { version = "0.6.3", features = ["liveview", "web"] }
+dioxus-logger = "0.6.2"
+getrandom = { version = "0.3.3", features = ["wasm_js"] }
+itertools = "*"
+mio = "1.0.4"
+num = "*"
+polars = { version = "*", features = [
+  "fmt",
+  "performant",
   "trigonometry",
   "cov",
-  "dtype-array",
-  "async",
   "dataframe_arithmetic",
   "ndarray",
   "to_dummies",
+  "abs",
+  "approx_unique",
+  "arg_where",
+  "asof_join",
+  "checked_arithmetic",
+  "cloud",
+  "coalesce",
+  "concat_str",
+  "cross_join",
+  "csv",
+  "cum_agg",
+  "cumulative_eval",
+  "decompress",
+  "describe",
+  "diagonal_concat",
+  "diff",
+  "docs",
+  "dot_diagram",
+  "dtype-full",
+  "dynamic_group_by",
+  "extract_groups",
+  "iejoin",
+  "interpolate",
+  "interpolate_by",
+  "ipc",
+  "ipc_streaming",
+  "ir_serde",
+  "is_between",
+  "is_first_distinct",
+  "is_in",
+  "is_last_distinct",
+  "json",
+  "lazy",
+  "list_eval",
+  "mode",
+  "ndarray",
+  "object",
+  "parquet",
+  "polars_cloud",
+  "product",
+  "propagate_nans",
+  "random",
+  "range",
+  "rank",
+  "repeat_by",
+  "replace",
+  "rolling_window",
+  "rolling_window_by",
+  "round_series",
+  "rows",
+  "semi_anti_join",
+  "serde",
+  "string_encoding",
+  "string_reverse",
+  "string_to_integer",
+  "strings",
+  "take_opt_iter",
+  "temporal",
+  "timezones",
+  "to_dummies",
+  "unique_counts",
+  "zip_with",
 ] }
-rayon = "1.10.0"
-thiserror = "2.0.12"
-tracing = "0.1.41"
-tracing-subscriber = { version = "0.3.19", features = ["local-time"] }
+rayon = "*"
+thiserror = "*"
+tracing = "*"
+tracing-subscriber = { version = "*", features = ["local-time"] }
+wasm-bindgen = "0.2"
+
+[profile.dev]
+opt-level = 1
+
+# [profile.dev.package."*"]
+# opt-level = 3
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+# [profile.wasm-dev.package."*"]
+# opt-level = 3
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"
+
+# [profile.release]
+# codegen-units = 1
+# lto = "thin"
+# opt-level = "s"
+# strip = "debuginfo"
+#
+#
+# [profile.release-native]
+# inherits = "release"
+# opt-level = 3
+# strip = "none"

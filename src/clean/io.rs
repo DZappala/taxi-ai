@@ -79,12 +79,12 @@ pub fn scan_csv(path: &Path) -> PolarsResult<DataFrame> {
 }
 
 #[derive(Debug, Clone)]
-pub struct NamedDataFrame<'a> {
+pub struct NamedData<'a> {
     pub(super) name: &'a str,
     pub(super) df: DataFrame,
 }
 
-impl<'a> NamedDataFrame<'a> {
+impl<'a> NamedData<'a> {
     #[instrument]
     pub(super) fn new(name: &'a str, df: DataFrame) -> Self {
         Self { name, df }
@@ -116,10 +116,10 @@ impl<'a> RawData<'a> {
 
 #[instrument]
 pub fn save_csv(
-    &mut NamedDataFrame {
+    &mut NamedData {
         ref mut name,
         ref mut df,
-    }: &mut NamedDataFrame<'_>,
+    }: &mut NamedData<'_>,
 ) {
     let path = format!("db/record/taxi_weather-{name}.csv");
     if exists(&path).unwrap() {
@@ -133,8 +133,8 @@ pub fn save_csv(
 }
 
 #[instrument]
-pub fn load_csv<'a>(path: &'a str, name: &'a str) -> NamedDataFrame<'a> {
+pub fn load_csv<'a>(path: &'a str, name: &'a str) -> NamedData<'a> {
     let file = File::open(path).unwrap();
     let df = CsvReader::new(file).finish().unwrap();
-    NamedDataFrame { name, df }
+    NamedData { name, df }
 }

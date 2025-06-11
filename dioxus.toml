@@ -1,0 +1,22 @@
+[application]
+name = "heatmap-inspector"
+default_platform = "web"
+out_dir = "out"
+asset_dir = "assets"
+
+[web.app]
+title = "Heatmap Ipr | ⛺"
+
+[web.watcher]
+reload_html = true
+watch_path = ["src", "assets"]
+
+[web.resource]
+style = []
+script = [
+  "https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js",
+  "https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js",
+]
+
+[web.resource.dev]
+script = []
