@@ -10,6 +10,11 @@ pub const JAN_RAW: &str = "db/raw/yellow_tripdata_2020-01.parquet";
 pub const MAR_RAW: &str = "db/raw/yellow_tripdata_2020-03.parquet";
 pub const MAY_RAW: &str = "db/raw/yellow_tripdata_2020-05.parquet";
 pub const WEATHER_RAW: &str = "db/raw/weather.csv";
+
+pub const JAN_SAVED: &str = "db/record/taxi_weather-Jan.csv";
+pub const MAR_SAVED: &str = "db/record/taxi_weather-Mar.csv";
+pub const MAY_SAVED: &str = "db/record/taxi_weather-May.csv";
+
 pub const COLS_TO_REMOVE: [&str; 51] = [
     "pickup_hour_cos",
     "pickup_hour_sin",
@@ -83,7 +88,7 @@ pub fn scan_csv(path: &Path) -> PolarsResult<DataFrame> {
         .collect()
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NamedDataFrame<'a> {
     pub(super) name: &'a str,
     pub(super) df: DataFrame,
@@ -105,7 +110,7 @@ impl<'a> NamedDataFrame<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(super) struct RawDataEntry<'a> {
     pub(super) name: &'a str,
     pub(super) ent: &'static str,
