@@ -4,17 +4,9 @@ use std::{
 };
 
 use polars::prelude::*;
-use tracing::{info, instrument, trace};
+use tracing::{info, instrument};
 
-pub const JAN_RAW: &str = "db/raw/yellow_tripdata_2020-01.parquet";
-pub const MAR_RAW: &str = "db/raw/yellow_tripdata_2020-03.parquet";
-pub const MAY_RAW: &str = "db/raw/yellow_tripdata_2020-05.parquet";
 pub const WEATHER_RAW: &str = "db/raw/weather.csv";
-
-pub const JAN_SAVED: &str = "db/record/taxi_weather-Jan.csv";
-pub const MAR_SAVED: &str = "db/record/taxi_weather-Mar.csv";
-pub const MAY_SAVED: &str = "db/record/taxi_weather-May.csv";
-
 pub const COLS_TO_REMOVE: [&str; 51] = [
     "pickup_hour_cos",
     "pickup_hour_sin",
@@ -71,8 +63,6 @@ pub const COLS_TO_REMOVE: [&str; 51] = [
 
 #[instrument]
 pub fn scan_csv(path: &Path) -> PolarsResult<DataFrame> {
-    trace!("scan_csv()");
-    trace!("Reading csv file {:?}", path.to_str());
     LazyCsvReader::new(path)
         .with_has_header(true)
         .with_try_parse_dates(true)
@@ -97,30 +87,29 @@ pub struct NamedDataFrame<'a> {
 impl<'a> NamedDataFrame<'a> {
     #[instrument]
     pub(super) fn new(name: &'a str, df: DataFrame) -> Self {
-        trace!("new()");
-        trace!("New NamedDataFrame {name:?}");
         Self { name, df }
     }
 
     #[instrument]
     pub fn df(&self) -> &DataFrame {
-        trace!("df()");
-        trace!("Get df {:?}", self.name);
         &self.df
+    }
+
+    #[instrument]
+    pub fn name(&self) -> &'a str {
+        &self.name
     }
 }
 
 #[derive(Debug, Clone)]
-pub(super) struct RawDataEntry<'a> {
-    pub(super) name: &'a str,
-    pub(super) ent: &'static str,
+pub struct RawData<'a> {
+    pub name: &'a str,
+    pub ent: &'static str,
 }
 
-impl<'a> RawDataEntry<'a> {
+impl<'a> RawData<'a> {
     #[instrument]
-    pub(super) fn new(name: &'a str, ent: &'static str) -> Self {
-        trace!("new()");
-        trace!("New RawDataEntry {name:?}");
+    pub fn new(name: &'a str, ent: &'static str) -> Self {
         Self { name, ent }
     }
 }
@@ -132,9 +121,7 @@ pub fn save_csv(
         ref mut df,
     }: &mut NamedDataFrame<'_>,
 ) {
-    trace!("save_csv()");
     let path = format!("db/record/taxi_weather-{name}.csv");
-    trace!("Saving csv file to {path:?}");
     if exists(&path).unwrap() {
         info!("Removing csv file. Already exists.");
         remove_file(&path).unwrap();
@@ -143,4 +130,11 @@ pub fn save_csv(
     info!("Creating csv file {path:?}");
     let mut file = File::create(path).unwrap();
     CsvWriter::new(&mut file).finish(df).unwrap();
+}
+
+#[instrument]
+pub fn load_csv<'a>(path: &'a str, name: &'a str) -> NamedDataFrame<'a> {
+    let file = File::open(path).unwrap();
+    let df = CsvReader::new(file).finish().unwrap();
+    NamedDataFrame { name, df }
 }

@@ -2,23 +2,16 @@ use charming::{
     Chart, HtmlRenderer,
     component::{Axis, Grid, VisualMap},
     datatype::DataPoint,
-    df as charming_df,
     element::{AxisType, Emphasis, ItemStyle, Label, Orient, SplitArea, Tooltip},
     series::Heatmap,
 };
 
-use itertools::Itertools;
 use polars::prelude::{cov::pearson_corr, *};
-use rayon::iter::{
-    IndexedParallelIterator, IntoParallelIterator, IntoParallelRefIterator, ParallelIterator,
-};
-use tracing::{instrument, trace};
+use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
+use tracing::instrument;
 
 #[instrument]
 pub fn chart(data: &DataFrame) -> Chart {
-    trace!("chart()");
-    trace!("Transforming dataframe");
-
     let cols: Vec<_> = data
         .get_columns()
         .par_iter()
@@ -84,7 +77,9 @@ pub fn chart(data: &DataFrame) -> Chart {
         )
 }
 
-pub fn render(chart: Chart, name: &'static str) {
+pub fn render(chart: Chart, name: &str) {
     let mut renderer = HtmlRenderer::new(name, 1000, 1000);
-    renderer.save(&chart, "out/charts.html").unwrap();
+    renderer
+        .save(&chart, format!("out/{name}-chart.html"))
+        .unwrap();
 }
