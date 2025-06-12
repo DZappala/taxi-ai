@@ -1,4 +1,5 @@
 /target
+/db/raw/yellow_*.csv
 /db/record/*
 /db/log/*
 /db/www/*
