@@ -3,5 +3,5 @@
 /db/record/*
 /db/log/*
 /db/www/*
-/out
+out
 /graph.png
